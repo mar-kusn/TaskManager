@@ -10,10 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class TaskManager {
     static final String DB_FILE_NAME = "tasks.csv";
@@ -67,8 +64,6 @@ public class TaskManager {
                 }
             }
         }
-        System.out.println(taskDesc);
-
 
         System.out.println("Please add task due date");
         String taskDueDate = " ";
@@ -84,7 +79,6 @@ public class TaskManager {
                 }
             }
         }
-        System.out.println(taskDueDate);
 
         System.out.println("Is your task is important: " + ConsoleColors.RED + "true" +
                 ConsoleColors.RESET + "/" + ConsoleColors.RED + "false");
@@ -103,13 +97,22 @@ public class TaskManager {
             }
         }
 
+        System.out.println("tasks.length: " + tasks.length);
+        tasks = Arrays.copyOf(tasks, tasks.length+1);
+        System.out.println("new tasks.length: " + tasks.length);
+        tasks[tasks.length-1] = new String[tasks[0].length];
 
+
+        tasks[tasks.length-1][0] = taskDesc;
+        tasks[tasks.length-1][1] = taskDueDate;
+        tasks[tasks.length-1][2] = important;
     }
 
     private static void saveAndExit() {
         // save tasks to file
         saveTasksToDB();
     //    listTasks();
+        System.out.println(ConsoleColors.RED + "Bye, bye!" + ConsoleColors.RESET);
         System.exit(0);
     }
 
@@ -136,8 +139,6 @@ public class TaskManager {
             } catch (IOException e) {
                 System.out.println("Error while writing a file: " + dbPath.toAbsolutePath());
             }
-
-            //    System.out.println(outList.toString());
         }
     }
 
@@ -152,8 +153,9 @@ public class TaskManager {
 
     public static void listTasks() {
         for (int i = 0; i < tasks.length; i++) {
+            System.out.print(i+": ");
             for (int j = 0; j < tasks[i].length; j++) {
-                System.out.print(i + " : " + tasks[i][j] + " ");
+                System.out.print(tasks[i][j] + " ");
             }
             System.out.println();
         }
