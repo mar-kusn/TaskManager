@@ -118,7 +118,7 @@ public class TaskManager {
             if (!scanner.hasNextLine()) {
                 scanner.next();
             } else {
-                taskDueDate = scanner.nextLine();
+                taskDueDate = scanner.nextLine().replaceAll("\\s", "");
                 if (checkDateFormat(taskDueDate)) {
                     isCorrectDateFormat = true;
                 } else {
