@@ -53,14 +53,14 @@ public class TaskManager {
 
     public static String[][] readDbFile() {
         Path dbPath = Path.of(DB_FILE_NAME);
-
+        // dodatkowa tablica do której będziemy wczytywać dane
         String[][] result = null;
+
         // sprawdzamy czy plik istnieje
         if (!Files.exists(dbPath)) {
             errorMessage("File '" + dbPath.toAbsolutePath() + "' not exist!");
             System.exit(0);
         } else {
-            // dodatkowa tablica do której będziemy wczytywać dane
             try {
                 List<String> lines = Files.readAllLines(dbPath);
                 // jeżeli plik nie jest pusty
@@ -79,16 +79,14 @@ public class TaskManager {
                     return null;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                errorMessage("Error while reading a file: " + dbPath.toAbsolutePath());
             }
         }
         return result;
     }
 
     public static void menu(String[] menuTab) {
-
-        System.out.println(ConsoleColors.BLUE);
-        System.out.println("Please select an option: " + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.BLUE + "Please select an option: " + ConsoleColors.RESET);
         for (String option : MENU_OPTIONS) {
             System.out.println(option);
         }
@@ -106,7 +104,7 @@ public class TaskManager {
                 if (taskDesc.length() > 0) {
                     break;
                 } else {
-                    System.out.println("Please add task description");
+                    warningMessage("Please add correct task description");
                 }
             }
         }
@@ -123,7 +121,7 @@ public class TaskManager {
                     isCorrectDateFormat = true;
                 } else {
                     isCorrectDateFormat = false;
-                    System.out.println("Please add task due date (format YYYY-MM-DD)");
+                    warningMessage("Please add correct task due date (format YYYY-MM-DD)");
                 }
             }
         }
@@ -139,8 +137,8 @@ public class TaskManager {
                 if (important.equals("true") || important.equals("false")) {
                     break;
                 } else {
-                    System.out.println(ConsoleColors.RESET + "Is your task is important: " + ConsoleColors.RED + "true" +
-                            ConsoleColors.RESET + "/" + ConsoleColors.RED + "false" + ConsoleColors.RESET);
+                    warningMessage("Is your task is important: " +
+                            ConsoleColors.RED_BOLD + "true" + ConsoleColors.RESET + "/" + ConsoleColors.RED_BOLD + "false" + ConsoleColors.RESET);
                 }
             }
         }
@@ -163,16 +161,16 @@ public class TaskManager {
     }
 
     public static boolean checkDateFormat(String date) {
-        int [] dateSize = {4, 2, 2};
+        int[] dateSize = {4, 2, 2};
         String[] dateParts = date.replaceAll("\\s", "").split("-");
 
         if (dateParts.length == 3) {
-            for (int i = 0; i <  dateParts.length; i++) {
+            for (int i = 0; i < dateParts.length; i++) {
                 if (dateParts[i].length() != dateSize[i]) {
                     return false;
                 }
             }
-            for (int i = 0; i <  dateParts.length; i++) {
+            for (int i = 0; i < dateParts.length; i++) {
                 if (!NumberUtils.isParsable(dateParts[i])) {
                     return false;
                 }
@@ -193,7 +191,7 @@ public class TaskManager {
             } else {
                 countStr = "(options: 0)";
             }
-            System.out.println("Please select number to remove " +countStr);
+            System.out.println("Please select number to remove " + countStr);
             Scanner scanner = new Scanner(System.in);
             String toRemove = "";
             while (true) {
@@ -201,14 +199,14 @@ public class TaskManager {
                 if (NumberUtils.isParsable(toRemove) && Integer.parseInt(toRemove) >= 0) {
                     try {
                         tasks = ArrayUtils.remove(tasks, Integer.parseInt(toRemove));
-                        System.out.println("Value '"+toRemove+"' was successfully deleted");
+                        System.out.println("Value '" + toRemove + "' was successfully deleted");
                         break;
                     } catch (IndexOutOfBoundsException e) {
                         warningMessage("Element " + toRemove + " doesn't exist in list!");
-                        warningMessage("Please select correct number to remove "+countStr);
+                        warningMessage("Please select correct number to remove " + countStr);
                     }
                 } else {
-                    warningMessage("Please select correct number to remove "+countStr);
+                    warningMessage("Please select correct number to remove " + countStr);
                 }
             }
         } else {
@@ -220,7 +218,7 @@ public class TaskManager {
         // jeżeli tablica nie jest null'em i jej rozmiar jest > 0 to ją wyświetlamy
         if (tasks != null && tasks.length > 0) {
             for (int i = 0; i < tasks.length; i++) {
-                System.out.print(i + ": ");
+                System.out.printf("%2d: ", i);
                 for (int j = 0; j < tasks[i].length; j++) {
                     System.out.print(tasks[i][j] + " ");
                 }
@@ -232,19 +230,18 @@ public class TaskManager {
     }
 
     private static void saveAndExit() {
-        // save tasks to file
+        // save tasks to db file
         saveTasksToDB();
         System.out.println(ConsoleColors.RED + "Bye, bye!" + ConsoleColors.RESET);
         System.exit(0);
     }
 
     private static void saveTasksToDB() {
-
         // jeżeli w tabeli są zapisane jakieś zadania
         if (tasks != null) {
             Path dbPath = Path.of(DB_FILE_NAME);
             if (!Files.exists(dbPath)) {
-                errorMessage("Error while open file: " + dbPath.toAbsolutePath());
+                errorMessage("File '" + dbPath.toAbsolutePath() + "' not exist!");
             } else {
                 // lista zawierająca wszystkie linie pliku
                 List<String> outList = new ArrayList<>();
