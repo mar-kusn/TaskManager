@@ -111,17 +111,19 @@ public class TaskManager {
             }
         }
 
-        System.out.println("Please add task due date");
+        System.out.println("Please add task due date (format YYYY-MM-DD)");
         String taskDueDate = " ";
-        while (true) {
+        boolean isCorrectDateFormat = false;
+        while (!isCorrectDateFormat) {
             if (!scanner.hasNextLine()) {
                 scanner.next();
             } else {
                 taskDueDate = scanner.nextLine();
-                if (taskDueDate.length() > 4) {
-                    break;
+                if (checkDateFormat(taskDueDate)) {
+                    isCorrectDateFormat = true;
                 } else {
-                    System.out.println("Please add task due date");
+                    isCorrectDateFormat = false;
+                    System.out.println("Please add task due date (format YYYY-MM-DD)");
                 }
             }
         }
@@ -160,6 +162,26 @@ public class TaskManager {
 
     }
 
+    public static boolean checkDateFormat(String date) {
+        int [] dateSize = {4, 2, 2};
+        String[] dateParts = date.replaceAll("\\s", "").split("-");
+
+        if (dateParts.length == 3) {
+            for (int i = 0; i <  dateParts.length; i++) {
+                if (dateParts[i].length() != dateSize[i]) {
+                    return false;
+                }
+            }
+            for (int i = 0; i <  dateParts.length; i++) {
+                if (!NumberUtils.isParsable(dateParts[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     private static void removeTask() {
         // jeżeli w tabeli są zapisane jakieś zadania -> możemy coś usunąć
         if (tasks != null && tasks.length > 0) {
@@ -179,6 +201,7 @@ public class TaskManager {
                 if (NumberUtils.isParsable(toRemove) && Integer.parseInt(toRemove) >= 0) {
                     try {
                         tasks = ArrayUtils.remove(tasks, Integer.parseInt(toRemove));
+                        System.out.println("Value '"+toRemove+"' was successfully deleted");
                         break;
                     } catch (IndexOutOfBoundsException e) {
                         warningMessage("Element " + toRemove + " doesn't exist in list!");
